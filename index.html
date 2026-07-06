@@ -548,8 +548,33 @@ GROUPS.forEach(g => {
   if(!state.months[g.id]) state.months[g.id] = { tasks:{}, families:{}, familyList:g.families.slice() };
   if(!state.months[g.id].familyList) state.months[g.id].familyList = g.families.slice();
 });
+
+   
 if(!state.supplies) state.supplies = JSON.parse(JSON.stringify(DEFAULT_SUPPLIES));
 
+/* Roster sync — the GROUPS lists in this file are the source of truth.
+   If names are added, removed, or moved between groups in the code, this
+   fingerprint changes and the saved family lists are rebuilt from the code.
+   Check-ins are kept for any name that still exists in that month's group. */
+const ROSTER_HASH = (() => {
+  const s = GROUPS.map(g => g.id + ':' + g.families.join('|')).join(';');
+  let h = 0;
+  for(let i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) | 0; }
+  return String(h);
+})();
+
+if(state.rosterHash !== ROSTER_HASH){
+  GROUPS.forEach(g => {
+    const ms = state.months[g.id];
+    ms.familyList = g.families.slice();          // rebuild list from the file
+    Object.keys(ms.families || {}).forEach(n => {
+      if(!ms.familyList.includes(n)) delete ms.families[n];  // drop stale check-ins
+    });
+  });
+  state.rosterHash = ROSTER_HASH;
+  storage.save(state);
+}
+   
 let selectedMonth = currentMonthId();
 let currentView = 'dashboard';
 
