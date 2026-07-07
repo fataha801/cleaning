@@ -522,6 +522,17 @@ const DEFAULT_SUPPLIES = [
 
 const LOW_THRESHOLD = 2;
 const STORE_KEY = 'lehi41-cleaning-v1';
+const DATA_VERSION = '2026-07-07-v2';
+const VERSION_KEY = STORE_KEY + '-version';
+
+/* Storage block stays here */
+
+if (window.localStorage.getItem(VERSION_KEY) !== DATA_VERSION) {
+  window.localStorage.removeItem(STORE_KEY);
+  window.localStorage.setItem(VERSION_KEY, DATA_VERSION);
+}
+
+let state = storage.load() || freshState();
 
 /* ============================================================
    Storage — localStorage when available, in-memory fallback
