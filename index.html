@@ -521,9 +521,18 @@ const DEFAULT_SUPPLIES = [
 ].map((n,i)=>({ id:'s'+i, name:n, qty:5, notes:'', request:false }));
 
 const LOW_THRESHOLD = 2;
+const APP_VERSION = '2026-07-07-v4';
 const STORE_KEY = 'lehi41-cleaning-v1';
-const DATA_VERSION = '2026-07-07-v2';
-const VERSION_KEY = STORE_KEY + '-version';
+const VERSION_KEY = STORE_KEY + '-app-version';
+
+try {
+  const savedVersion = window.localStorage.getItem(VERSION_KEY);
+
+  if (savedVersion !== APP_VERSION) {
+    window.localStorage.removeItem(STORE_KEY);
+    window.localStorage.setItem(VERSION_KEY, APP_VERSION);
+  }
+} catch (e) {}
 
 /* Storage block stays here */
 
