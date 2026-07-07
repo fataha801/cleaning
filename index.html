@@ -206,12 +206,20 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
   border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;min-height:60px;
 }
 .family.done{border-color:var(--primary);background:var(--primary-soft)}
-.f-check{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center}
-.f-check svg{width:18px;height:18px;color:#fff;opacity:0}
-.family.done .f-check{background:var(--primary);border-color:var(--primary)}
-.family.done .f-check svg{opacity:1}
 .f-info{min-width:0;flex:1}
 .f-name{font-weight:600;font-size:.98rem}
+.f-count{font-size:.72rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.family.done .f-count{color:var(--primary-strong)}
+.weeks{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.week-chip{
+  min-width:52px;min-height:38px;padding:0 10px;border-radius:999px;
+  border:1.5px solid var(--line);background:var(--surface);
+  font-family:var(--display);font-weight:600;font-size:.78rem;color:var(--muted);
+  font-variant-numeric:tabular-nums;transition:background .15s,border-color .15s,color .15s;
+}
+.week-chip:hover{border-color:var(--primary)}
+.week-chip.on{background:var(--primary);border-color:var(--primary);color:#fff}
+[data-theme="dark"] .week-chip.on{color:#10201B}
 .f-task{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.03em;padding:2px 8px;border-radius:99px;background:var(--surface-2);color:var(--muted)}
 .badge.month{background:var(--primary-soft);color:var(--primary-strong)}
@@ -306,8 +314,9 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
   .print-only li{list-style:none;margin:5px 0;font-size:.9rem}
   .print-only li::before{content:'';display:inline-block;width:12px;height:12px;border:1.5px solid #000;border-radius:3px;margin-right:9px;vertical-align:-1px}
   .print-only ul{padding:0;margin:0;columns:2;column-gap:28px}
-  .print-only .p-fams{columns:3;font-size:.82rem}
-  .print-only .p-fams li::before{width:9px;height:9px}
+  .print-only .p-fams{columns:2;font-size:.82rem}
+  .print-only .p-fams li::before{display:none}
+  .print-only .p-box{display:inline-block;width:11px;height:11px;border:1.2px solid #000;border-radius:2px;margin-right:3px;vertical-align:-1px}
 }
 </style>
 </head>
@@ -352,7 +361,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
             <div class="hero-stats">
               <span><b id="statFamilies">0</b> families</span>
               <span><b id="statTasks">0</b> tasks done</span>
-              <span><b id="statFamDone">0</b> checked in</span>
+              <span><b id="statFamDone">0</b> families helped</span>
             </div>
           </div>
         </div>
@@ -406,7 +415,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
       <h2 id="famTitle">Families</h2>
       <span class="badge month" id="famBadge"></span>
     </div>
-    <p class="muted" id="famHint" style="font-size:.85rem;margin:0 0 12px">Tap the circle when a family checks in or finishes their assignment.</p>
+    <p class="muted" id="famHint" style="font-size:.85rem;margin:0 0 12px">Tap each Saturday a family helped clean. Every date is a separate toggle, so you can see who's been coming week to week.</p>
     <div id="familyList"></div>
     <div class="add-family">
       <input type="text" id="newFamilyName" placeholder="Add a family (e.g., John and Jane Doe)" aria-label="New family name">
@@ -493,9 +502,9 @@ const AREAS = [
   { id:'bathrooms', name:'Bathrooms', tasks:[
       'Deep clean toilets','Mop bathroom floors','Refill supplies if needed']},
   { id:'gym', name:'Gym / Cultural Hall', tasks:[
-      'Sweep gym floor','Mop gym floor','Arrange overflow and cultural hall chairs in a 4-10-4 layout (at least 6 rows)']},
-  { id:'ss-rs', name:'Sunday School / Relief Society', tasks:[
-      'Organize chairs']},
+      'Sweep gym floor','Mop gym floor']},
+  { id:'ss-rs', name:'Chair Setup', tasks:[
+      'Organize overflow and cultural hall chairs in a 4-10-4 layout (at least 6 rows)']},
   { id:'primary', name:'Primary', tasks:[
       'Organize chairs']},
   { id:'kitchen', name:'Kitchen', tasks:[
@@ -524,10 +533,10 @@ const storage = (() => {
     window.localStorage.removeItem(t);
     return {
       load: () => {
-  try { return JSON.parse(window.localStorage.getItem(STORE_KEY) || 'null'); }
-  catch (e) { return null; }
-},
-save: (s) => { try { window.localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} },
+        try { return JSON.parse(window.localStorage.getItem(STORE_KEY) || 'null'); }
+        catch (e) { return null; } // corrupted save — start fresh instead of crashing
+      },
+      save: (s) => { try { window.localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} },
       persistent: true
     };
   } catch (e) {
@@ -552,8 +561,6 @@ GROUPS.forEach(g => {
   if(!state.months[g.id]) state.months[g.id] = { tasks:{}, families:{}, familyList:g.families.slice() };
   if(!state.months[g.id].familyList) state.months[g.id].familyList = g.families.slice();
 });
-
-   
 if(!state.supplies) state.supplies = JSON.parse(JSON.stringify(DEFAULT_SUPPLIES));
 
 /* Roster sync — the GROUPS lists in this file are the source of truth.
@@ -566,21 +573,48 @@ const ROSTER_HASH = (() => {
   for(let i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) | 0; }
   return String(h);
 })();
-
 if(state.rosterHash !== ROSTER_HASH){
   GROUPS.forEach(g => {
     const ms = state.months[g.id];
-    ms.familyList = g.families.slice();          // rebuild list from the file
+    ms.familyList = g.families.slice();
     Object.keys(ms.families || {}).forEach(n => {
-      if(!ms.familyList.includes(n)) delete ms.families[n];  // drop stale check-ins
+      if(!ms.familyList.includes(n)) delete ms.families[n];
     });
   });
   state.rosterHash = ROSTER_HASH;
   storage.save(state);
 }
-   
+
 let selectedMonth = currentMonthId();
 let currentView = 'dashboard';
+
+/* Weekly tracking — every month is broken into its Saturdays.
+   ms.families[name] is an object like {0:true, 2:true} meaning
+   the family helped on that month's 1st and 3rd Saturdays. */
+const _satCache = {};
+function saturdaysFor(monthNum){
+  if(_satCache[monthNum]) return _satCache[monthNum];
+  const y = new Date().getFullYear();
+  const out = [];
+  const d = new Date(y, monthNum - 1, 1);
+  while(d.getMonth() === monthNum - 1){
+    if(d.getDay() === 6) out.push({ label: monthNum + '/' + d.getDate(), long: d.toLocaleDateString(undefined, { month:'short', day:'numeric' }) });
+    d.setDate(d.getDate() + 1);
+  }
+  return (_satCache[monthNum] = out);
+}
+function weeksHelped(rec){ return rec ? Object.values(rec).filter(Boolean).length : 0; }
+
+/* Migrate saves from the old one-checkmark-per-month format:
+   a plain `true` becomes "helped on week 1" so no credit is lost. */
+GROUPS.forEach(g => {
+  const fams = state.months[g.id].families || {};
+  Object.keys(fams).forEach(n => {
+    if(fams[n] === true) fams[n] = { 0: true };
+    else if(fams[n] === false) delete fams[n];
+  });
+});
+storage.save(state);
 
 function currentMonthId(){
   const m = new Date().getMonth() + 1;
@@ -658,7 +692,7 @@ function renderDashboard(){
   document.getElementById('heroGroup').textContent = g.name;
   document.getElementById('statFamilies').textContent = ms.familyList.length;
   document.getElementById('statTasks').textContent = p.done + '/' + p.total;
-  document.getElementById('statFamDone').textContent = ms.familyList.filter(f => ms.families[f]).length;
+  document.getElementById('statFamDone').textContent = ms.familyList.filter(f => weeksHelped(ms.families[f]) > 0).length;
   document.getElementById('ringPct').textContent = p.pct + '%';
 
   const bar = document.getElementById('ringBar');
@@ -691,10 +725,11 @@ function renderDashboard(){
   document.getElementById('dashFamCount').textContent = ms.familyList.length;
   famWrap.innerHTML = '';
   ms.familyList.slice(0, 6).forEach(f => {
+    const helped = weeksHelped(ms.families[f]);
     const row = document.createElement('div');
     row.className = 'alert-item';
-    row.innerHTML = '<span class="dot" style="background:' + (ms.families[f] ? 'var(--ok)' : 'var(--line)') + '"></span>' +
-      '<span>' + esc(f) + '</span><small>' + (ms.families[f] ? 'Checked in' : '') + '</small>';
+    row.innerHTML = '<span class="dot" style="background:' + (helped ? 'var(--ok)' : 'var(--line)') + '"></span>' +
+      '<span>' + esc(f) + '</span><small>' + (helped ? helped + '/' + saturdaysFor(g.num).length + ' wks' : '') + '</small>';
     famWrap.appendChild(row);
   });
   if(ms.familyList.length > 6){
@@ -808,7 +843,7 @@ function renderFamilies(){
 
   const g = group();
   const ms = mstate();
-  titleRow.querySelector('h2').textContent = g.month + ' · ' + ms.familyList.filter(f=>ms.families[f]).length + ' of ' + ms.familyList.length + ' checked in';
+  titleRow.querySelector('h2').textContent = g.month + ' · ' + ms.familyList.filter(f => weeksHelped(ms.families[f]) > 0).length + ' of ' + ms.familyList.length + ' have helped';
   document.getElementById('famBadge').textContent = g.name;
   hint.style.display = '';
   ms.familyList.forEach(f => wrap.appendChild(familyRow(g, f, false)));
@@ -817,25 +852,37 @@ function renderFamilies(){
 
 function familyRow(g, name, showMonth){
   const ms = mstate(g.id);
-  const done = !!ms.families[name];
+  const weeks = saturdaysFor(g.num);
+  const rec = ms.families[name] || {};
+  const helped = weeksHelped(rec);
   const row = document.createElement('div');
-  row.className = 'family' + (done ? ' done' : '');
-
-  const check = document.createElement('button');
-  check.className = 'f-check';
-  check.setAttribute('aria-label', (done ? 'Mark not complete: ' : 'Mark complete: ') + name);
-  check.setAttribute('aria-pressed', String(done));
-  check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-  check.addEventListener('click', () => {
-    ms.families[name] = !ms.families[name];
-    save(); renderFamilies(); renderDashboard();
-  });
-  row.appendChild(check);
+  row.className = 'family' + (helped === weeks.length ? ' done' : '');
 
   const info = document.createElement('div');
   info.className = 'f-info';
-  info.innerHTML = '<div class="f-name">' + esc(name) + '</div>' +
-    (showMonth ? '<div class="f-task"><span class="badge month">' + g.month + '</span></div>' : '');
+  info.innerHTML = '<div class="f-name">' + esc(name) +
+    (showMonth ? ' <span class="badge month">' + g.month + '</span>' : '') +
+    ' <span class="f-count">' + helped + '/' + weeks.length + ' wks</span></div>';
+
+  const chipWrap = document.createElement('div');
+  chipWrap.className = 'weeks';
+  weeks.forEach((w, i) => {
+    const chip = document.createElement('button');
+    chip.className = 'week-chip' + (rec[i] ? ' on' : '');
+    chip.textContent = w.label;
+    chip.setAttribute('aria-pressed', String(!!rec[i]));
+    chip.setAttribute('aria-label', name + ' — helped Saturday ' + w.long);
+    chip.addEventListener('click', () => {
+      const r = ms.families[name] || {};
+      r[i] = !r[i];
+      if(!r[i]) delete r[i];
+      if(Object.keys(r).length) ms.families[name] = r;
+      else delete ms.families[name];
+      save(); renderFamilies(); renderDashboard();
+    });
+    chipWrap.appendChild(chip);
+  });
+  info.appendChild(chipWrap);
   row.appendChild(info);
 
   const del = document.createElement('button');
@@ -947,8 +994,11 @@ function buildPrintSheet(){
     a.tasks.forEach(t => { html += '<li>' + esc(t) + '</li>'; });
     html += '</ul>';
   });
-  html += '<h3>Families (' + ms.familyList.length + ')</h3><ul class="p-fams">';
-  ms.familyList.forEach(f => { html += '<li>' + esc(f) + '</li>'; });
+  const weeks = saturdaysFor(g.num);
+  html += '<h3>Families (' + ms.familyList.length + ') — Saturdays: ' + weeks.map(w => w.label).join(' · ') + '</h3><ul class="p-fams">';
+  ms.familyList.forEach(f => {
+    html += '<li>' + weeks.map(() => '<span class="p-box"></span>').join('') + ' ' + esc(f) + '</li>';
+  });
   html += '</ul>';
   document.getElementById('printSheet').innerHTML = html;
 }
