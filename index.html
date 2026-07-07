@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'">
 <title>Lehi 41st Ward · Chapel Cleaning</title>
 <meta name="description" content="Meetinghouse cleaning assignments, checklists, and supply tracking for the Lehi 41st Ward.">
 <meta name="theme-color" content="#2E6E5E">
@@ -16,7 +16,6 @@
 <style>
 /* ============================================================
    Lehi 41st Ward — Chapel Cleaning Manager
-   Design tokens
    ============================================================ */
 :root{
   --bg:#F6F4EF;
@@ -463,13 +462,11 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="print-only" id="printSheet"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ============================================================
    Data — rotation groups, families, and the standard checklist
    ============================================================ */
-const SUPABASE_URL = 'https://evidptumwaumznaqvmme.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2aWRwdHVtd2F1bXpuYXF2bW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NDExNjUsImV4cCI6MjA5OTAxNzE2NX0.mEjmHYYb80iQrMq9JnuSdTC8RK_DX85jIOuHTvvR5D4';
-
 const GROUPS = [
   { id:'jul', month:'July', num:7, name:'Bishopric / Young Women',
     families:["Lani Ita’aehau","Orlando Aitofele","Jamie Aloua","Zane and Brianna Carter","Alisi Fangupo","Joe and Shelli Hafoka","Marcus and Irene Hatfield","Alan Iwaasa","Bishop and Sunny Mahe","Sione and Ana Mahe","Fotu and Gursteen Moeai","Ezra and Kerstin Ngakuru","Tevita Palepale","Caylee Wendling","Richard and Tilila Paongo","Sosaia Paongo","Nathan and Ashley Speaker","George and Jenny Uyema","Ethan and Evie Woods"]},
@@ -524,19 +521,33 @@ const DEFAULT_SUPPLIES = [
 ].map((n,i)=>({ id:'s'+i, name:n, qty:5, notes:'', request:false }));
 
 const LOW_THRESHOLD = 2;
-const APP_VERSION = '2026-07-07-v5';
+const APP_VERSION = '2026-07-07-v6';
 const STORE_KEY = 'lehi41-cleaning-v1';
 const VERSION_KEY = STORE_KEY + '-app-version';
-
 try {
-  const savedVersion = window.localStorage.getItem(VERSION_KEY);
-
-  if (savedVersion !== APP_VERSION) {
+  if (window.localStorage.getItem(VERSION_KEY) !== APP_VERSION) {
     window.localStorage.removeItem(STORE_KEY);
     window.localStorage.setItem(VERSION_KEY, APP_VERSION);
   }
 } catch (e) {}
 
+/* ============================================================
+   Supabase (cloud sync) — PASTE YOUR TWO VALUES BELOW.
+   Find them in your Supabase dashboard under
+   Project Settings → API. Leave both blank ('') and the app
+   runs in device-only mode exactly as before.
+   ============================================================ */
+const SUPABASE_URL = 'https://evidptumwaumznaqvmme.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2aWRwdHVtd2F1bXpuYXF2bW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NDExNjUsImV4cCI6MjA5OTAxNzE2NX0.mEjmHYYb80iQrMq9JnuSdTC8RK_DX85jIOuHTvvR5D4';
+
+const CLOUD = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
+const CLEANING_YEAR = new Date().getFullYear(); // attendance & tasks are stored per year
+const sb = CLOUD ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const familyIds = {};   // group id -> { family name: db id }
+const familyById = {};  // db id -> { group, name }
+function cloudErr(where){
+  return (res) => { if(res && res.error){ console.error(where, res.error); toast('Sync failed — check your connection'); } };
+}
 
 /* ============================================================
    Storage — localStorage when available, in-memory fallback
@@ -588,7 +599,7 @@ const ROSTER_HASH = (() => {
   for(let i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) | 0; }
   return String(h);
 })();
-if(state.rosterHash !== ROSTER_HASH){
+if(!CLOUD && state.rosterHash !== ROSTER_HASH){
   GROUPS.forEach(g => {
     const ms = state.months[g.id];
     ms.familyList = g.families.slice();
@@ -812,6 +823,7 @@ function renderChecklist(){
       label.querySelector('input').addEventListener('change', (e) => {
         ms.tasks[tid] = e.target.checked;
         save(); renderChecklist(); renderDashboard();
+        if(CLOUD) sb.from('task_checks').upsert({ group_id: g.id, cleaning_year: CLEANING_YEAR, task_id: tid, checked: e.target.checked }).then(cloudErr('task'));
       });
       body.appendChild(label);
     });
@@ -827,9 +839,14 @@ document.getElementById('expandAll').addEventListener('click', () => {
 });
 document.getElementById('resetMonth').addEventListener('click', () => {
   const g = group();
-  if(!confirm('Clear all checked tasks and family check-ins for ' + g.month + '?')) return;
+  if(!confirm('Clear all checked tasks and attendance for ' + g.month + '? This clears it for everyone.')) return;
   mstate().tasks = {}; mstate().families = {};
   save(); renderAll(); toast(g.month + ' reset');
+  if(CLOUD){
+    sb.from('task_checks').delete().eq('group_id', g.id).eq('cleaning_year', CLEANING_YEAR).then(cloudErr('reset'));
+    const ids = Object.values(familyIds[g.id] || {});
+    if(ids.length) sb.from('attendance').delete().in('family_id', ids).eq('cleaning_year', CLEANING_YEAR).then(cloudErr('reset'));
+  }
 });
 
 /* ============================================================
@@ -894,11 +911,20 @@ function familyRow(g, name, showMonth){
       if(Object.keys(r).length) ms.families[name] = r;
       else delete ms.families[name];
       save(); renderFamilies(); renderDashboard();
+      if(CLOUD){
+        const fid = familyIds[g.id] && familyIds[g.id][name];
+        if(fid){
+          if(r[i]) sb.from('attendance').upsert({ family_id: fid, cleaning_year: CLEANING_YEAR, week_index: i }).then(cloudErr('attendance'));
+          else sb.from('attendance').delete().match({ family_id: fid, cleaning_year: CLEANING_YEAR, week_index: i }).then(cloudErr('attendance'));
+        }
+      }
     });
     chipWrap.appendChild(chip);
   });
   info.appendChild(chipWrap);
   row.appendChild(info);
+
+  if(CLOUD) return row; // roster is managed in the Supabase dashboard
 
   const del = document.createElement('button');
   del.className = 'f-remove';
@@ -918,6 +944,7 @@ document.getElementById('familySearch').addEventListener('input', renderFamilies
 document.getElementById('addFamilyBtn').addEventListener('click', addFamily);
 document.getElementById('newFamilyName').addEventListener('keydown', e => { if(e.key === 'Enter') addFamily(); });
 function addFamily(){
+  if(CLOUD){ toast('In cloud mode, edit the roster in your Supabase dashboard'); return; }
   const inp = document.getElementById('newFamilyName');
   const name = inp.value.trim();
   if(!name) return;
@@ -952,8 +979,8 @@ function renderSupplies(){
     const minus = btnQ('−', 'Decrease ' + s.name), plus = btnQ('+', 'Increase ' + s.name);
     const val = document.createElement('span');
     val.className = 'q-val'; val.textContent = s.qty;
-    minus.addEventListener('click', () => { s.qty = Math.max(0, s.qty - 1); save(); renderSupplies(); renderDashboard(); });
-    plus.addEventListener('click', () => { s.qty += 1; save(); renderSupplies(); renderDashboard(); });
+    minus.addEventListener('click', () => { s.qty = Math.max(0, s.qty - 1); save(); renderSupplies(); renderDashboard(); if(CLOUD && s.id) sb.from('supplies').update({ qty: s.qty }).eq('id', s.id).then(cloudErr('supply')); });
+    plus.addEventListener('click', () => { s.qty += 1; save(); renderSupplies(); renderDashboard(); if(CLOUD && s.id) sb.from('supplies').update({ qty: s.qty }).eq('id', s.id).then(cloudErr('supply')); });
     qty.append(minus, val, plus);
     top.appendChild(qty);
     el.appendChild(top);
@@ -964,12 +991,12 @@ function renderSupplies(){
     notes.rows = 1; notes.placeholder = 'Notes (brand, size, where it’s stored…)';
     notes.value = s.notes || '';
     notes.setAttribute('aria-label', 'Notes for ' + s.name);
-    notes.addEventListener('change', () => { s.notes = notes.value; save(); });
+    notes.addEventListener('change', () => { s.notes = notes.value; save(); if(CLOUD && s.id) sb.from('supplies').update({ notes: s.notes }).eq('id', s.id).then(cloudErr('supply')); });
     const reqLbl = document.createElement('label');
     reqLbl.className = 'req-toggle';
     const reqCb = document.createElement('input');
     reqCb.type = 'checkbox'; reqCb.checked = s.request;
-    reqCb.addEventListener('change', () => { s.request = reqCb.checked; save(); renderSupplies(); renderDashboard(); });
+    reqCb.addEventListener('change', () => { s.request = reqCb.checked; save(); renderSupplies(); renderDashboard(); if(CLOUD && s.id) sb.from('supplies').update({ request: s.request }).eq('id', s.id).then(cloudErr('supply')); });
     reqLbl.append(reqCb, document.createTextNode('Request replacement'));
     const rm = document.createElement('button');
     rm.className = 's-remove'; rm.textContent = 'Remove';
@@ -977,6 +1004,7 @@ function renderSupplies(){
       if(!confirm('Remove ' + s.name + ' from the inventory?')) return;
       state.supplies = state.supplies.filter(x => x !== s);
       save(); renderSupplies(); renderDashboard();
+      if(CLOUD && s.id) sb.from('supplies').delete().eq('id', s.id).then(cloudErr('supply'));
     });
     bottom.append(notes, reqLbl, rm);
     el.appendChild(bottom);
@@ -990,10 +1018,18 @@ function addSupply(){
   const inp = document.getElementById('newSupplyName');
   const name = inp.value.trim();
   if(!name) return;
-  state.supplies.push({ id:'s' + Date.now(), name, qty:5, notes:'', request:false });
+  const item = { id: CLOUD ? null : 's' + Date.now(), name, qty:5, notes:'', request:false };
+  state.supplies.push(item);
   inp.value = '';
   save(); renderSupplies();
   toast(name + ' added');
+  if(CLOUD){
+    sb.from('supplies').insert({ name }).select().single().then(res => {
+      if(res.error){ cloudErr('supply')(res); return; }
+      item.id = res.data.id;
+      save();
+    });
+  }
 }
 
 /* ============================================================
@@ -1039,20 +1075,116 @@ document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click'
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function renderAll(){ renderRail(); renderDashboard(); renderChecklist(); renderFamilies(); renderSupplies(); }
 
-applyTheme();
-renderAll();
-showView('dashboard');
-if(!storage.persistent){
-  setTimeout(() => toast('Heads up: saving is disabled in this preview — progress resets on reload'), 800);
+/* ============================================================
+   Cloud sync — initial load + live updates from Supabase
+   ============================================================ */
+async function loadCloud(){
+  const [g, f, att, tc, sup] = await Promise.all([
+    sb.from('groups').select('*'),
+    sb.from('families').select('*').order('sort_order'),
+    sb.from('attendance').select('*').eq('cleaning_year', CLEANING_YEAR),
+    sb.from('task_checks').select('*').eq('cleaning_year', CLEANING_YEAR),
+    sb.from('supplies').select('*').order('id')
+  ]);
+  for(const r of [g, f, att, tc, sup]) if(r.error) throw r.error;
+
+  g.data.forEach(row => { const gr = GROUPS.find(x => x.id === row.id); if(gr) gr.name = row.name; });
+  GROUPS.forEach(x => {
+    state.months[x.id].familyList = [];
+    state.months[x.id].families = {};
+    state.months[x.id].tasks = {};
+    familyIds[x.id] = {};
+  });
+  f.data.forEach(row => {
+    if(!state.months[row.group_id]) return;
+    state.months[row.group_id].familyList.push(row.name);
+    familyIds[row.group_id][row.name] = row.id;
+    familyById[row.id] = { group: row.group_id, name: row.name };
+  });
+  att.data.forEach(row => {
+    const fam = familyById[row.family_id]; if(!fam) return;
+    const ms = state.months[fam.group];
+    (ms.families[fam.name] = ms.families[fam.name] || {})[row.week_index] = true;
+  });
+  tc.data.forEach(row => {
+    if(state.months[row.group_id] && row.checked) state.months[row.group_id].tasks[row.task_id] = true;
+  });
+  state.supplies = sup.data.map(r => ({ id:r.id, name:r.name, qty:r.qty, notes:r.notes || '', request:!!r.request }));
+  storage.save(state); // keep an offline snapshot on this device
 }
 
-// PWA service worker (only when served over http/https)
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=' + APP_VERSION)
-      .then(reg => reg.update())
-      .catch(() => {});
-  });
+let liveConnected = false;
+let pollTimer = null;
+function subscribeRealtime(){
+  sb.channel('ward-sync')
+    .on('postgres_changes', { event:'*', schema:'public', table:'task_checks' }, p => {
+      const row = (p.new && p.new.group_id) ? p.new : p.old;
+      if(!row || row.cleaning_year !== CLEANING_YEAR || !state.months[row.group_id]) return;
+      if(p.eventType === 'DELETE' || !p.new.checked) delete state.months[row.group_id].tasks[row.task_id];
+      else state.months[row.group_id].tasks[row.task_id] = true;
+      storage.save(state); renderChecklist(); renderDashboard();
+    })
+    .on('postgres_changes', { event:'*', schema:'public', table:'attendance' }, p => {
+      const row = (p.new && p.new.family_id) ? p.new : p.old;
+      if(!row || row.cleaning_year !== CLEANING_YEAR) return;
+      const fam = familyById[row.family_id]; if(!fam) return;
+      const ms = state.months[fam.group];
+      if(p.eventType === 'DELETE'){
+        if(ms.families[fam.name]){
+          delete ms.families[fam.name][row.week_index];
+          if(!Object.keys(ms.families[fam.name]).length) delete ms.families[fam.name];
+        }
+      } else {
+        (ms.families[fam.name] = ms.families[fam.name] || {})[row.week_index] = true;
+      }
+      storage.save(state); renderFamilies(); renderDashboard();
+    })
+    .on('postgres_changes', { event:'*', schema:'public', table:'supplies' }, p => {
+      if(p.eventType === 'DELETE'){
+        state.supplies = state.supplies.filter(s => s.id !== p.old.id);
+      } else {
+        const r = p.new;
+        const cur = state.supplies.find(s => s.id === r.id);
+        if(cur){ cur.name = r.name; cur.qty = r.qty; cur.notes = r.notes || ''; cur.request = !!r.request; }
+        else state.supplies.push({ id:r.id, name:r.name, qty:r.qty, notes:r.notes || '', request:!!r.request });
+      }
+      storage.save(state); renderSupplies(); renderDashboard();
+    })
+    .subscribe((status) => {
+      console.log('Realtime status:', status);
+      const wasConnected = liveConnected;
+      liveConnected = (status === 'SUBSCRIBED');
+      if(liveConnected){
+        if(!wasConnected) toast('Live sync connected');
+        if(pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+      } else if(!pollTimer){
+        // Realtime unavailable — fall back to refreshing from the
+        // database every 20 seconds so devices still stay in sync.
+        toast('Live sync unavailable — updating every 20s instead');
+        pollTimer = setInterval(() => { loadCloud().then(renderAll).catch(() => {}); }, 20000);
+      }
+    });
+}
+
+applyTheme();
+document.querySelector('.brand small').textContent = 'Chapel Cleaning · ' + APP_VERSION + (CLOUD ? ' · cloud' : ' · device-only');
+renderAll();
+showView('dashboard');
+if(CLOUD){
+  document.querySelector('.add-family').style.display = 'none';
+  loadCloud()
+    .then(() => { renderAll(); subscribeRealtime(); })
+    .catch(err => {
+      console.error(err);
+      toast("Couldn't reach the database — showing this device's last saved copy");
+    });
+} else {
+  setTimeout(() => toast('⚠ Not connected to the database — this device is in device-only mode and will NOT share data'), 600);
+}
+
+// PWA service worker — network-first for pages, so updates always appear.
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js?v=' + APP_VERSION).catch(()=>{}));
 }
 </script>
 </body>
