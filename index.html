@@ -16,6 +16,7 @@
 <style>
 /* ============================================================
    Lehi 41st Ward — Chapel Cleaning Manager
+   Design tokens
    ============================================================ */
 :root{
   --bg:#F6F4EF;
@@ -57,7 +58,7 @@
   --ring-track:#2C3835;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
 }
-
+ 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
@@ -71,7 +72,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none;-we
 input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-
+ 
 /* ---------- Header ---------- */
 .app-header{
   position:sticky;top:0;z-index:20;
@@ -94,8 +95,8 @@ input,select,textarea{font:inherit;color:inherit}
 }
 .icon-btn:hover{background:var(--surface-2);color:var(--ink)}
 .icon-btn svg{width:22px;height:22px}
-
-
+ 
+ 
 /* ---------- Month rotation rail (signature) ---------- */
 .month-rail{max-width:960px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
 .month-rail::-webkit-scrollbar{display:none}
@@ -113,7 +114,7 @@ input,select,textarea{font:inherit;color:inherit}
   .month-pill{flex:1;flex-direction:column;gap:0;padding:8px 14px;border-radius:16px}
   .month-pill .m-grp{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
-
+ 
 /* ---------- Layout ---------- */
 main{max-width:960px;margin:0 auto;padding:18px 16px}
 .view{display:none}
@@ -121,13 +122,13 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .grid{display:grid;gap:14px}
 @media(min-width:820px){.grid.two{grid-template-columns:1fr 1fr}}
-
+ 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
 .card h2{font-size:1.05rem;font-weight:600;display:flex;align-items:center;gap:8px}
 .card h2 .count{margin-left:auto;font-size:.8rem;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
 .eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 .muted{color:var(--muted)}
-
+ 
 /* ---------- Dashboard hero ---------- */
 .hero{display:flex;align-items:center;gap:18px}
 .ring{flex:none;width:104px;height:104px;position:relative}
@@ -144,13 +145,13 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 .hero-stats b{color:var(--ink);font-variant-numeric:tabular-nums}
 .progress{height:10px;border-radius:99px;background:var(--ring-track);overflow:hidden;margin-top:14px}
 .progress>div{height:100%;background:var(--primary);border-radius:99px;transition:width .4s ease}
-
+ 
 .next-strip{
   display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;
   background:var(--surface-2);border-radius:var(--radius-sm);font-size:.9rem;
 }
 .next-strip svg{width:18px;height:18px;color:var(--muted);flex:none}
-
+ 
 /* ---------- Alerts ---------- */
 .alert-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
 .alert-item:last-child{border-bottom:none}
@@ -159,7 +160,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 .dot.req{background:var(--amber)}
 .alert-item small{margin-left:auto;color:var(--muted);white-space:nowrap}
 .empty{padding:18px 0;text-align:center;color:var(--muted);font-size:.92rem}
-
+ 
 /* ---------- Checklist ---------- */
 .area{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);margin-bottom:12px;overflow:hidden}
 .area-head{
@@ -191,7 +192,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 .task .t-label{flex:1}
 .task input:checked~.t-label{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted)}
 .checklist-tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-
+ 
 /* ---------- Families ---------- */
 .search-wrap{position:relative;margin-bottom:14px}
 .search-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
@@ -229,7 +230,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 .add-family input{flex:1;min-height:var(--tap);border:1.5px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);padding:0 14px}
 .group-title-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .group-title-row h2{font-size:1.2rem;font-weight:700}
-
+ 
 /* ---------- Supplies ---------- */
 .supply{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
@@ -259,7 +260,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 .s-remove{color:var(--danger);font-size:.8rem;font-weight:600;min-height:40px;padding:0 8px}
 .add-supply{display:flex;gap:8px;margin-top:12px}
 .add-supply input{flex:1;min-height:var(--tap);border:1.5px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);padding:0 14px}
-
+ 
 /* ---------- Buttons ---------- */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
@@ -272,7 +273,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 .btn.ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
 .btn.ghost:hover{background:var(--surface-2)}
 .btn svg{width:18px;height:18px}
-
+ 
 /* ---------- Bottom nav ---------- */
 .tabbar{
   position:fixed;left:0;right:0;bottom:0;z-index:30;
@@ -291,7 +292,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
   .tabbar{position:static;max-width:960px;margin:0 auto;border:none;background:none;justify-content:flex-start;gap:6px;padding:14px 16px 0}
   .tab{flex-direction:row;gap:8px;font-size:.88rem;max-width:none;flex:none;padding:10px 18px;border-radius:999px}
 }
-
+ 
 /* ---------- Toast ---------- */
 .toast{
   position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
@@ -300,7 +301,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
   max-width:90vw;text-align:center;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
+ 
 /* ---------- Print ---------- */
 .print-only{display:none}
 @media print{
@@ -320,7 +321,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
 </style>
 </head>
 <body>
-
+ 
 <header class="app-header">
   <div class="header-row">
     <div class="brand">
@@ -340,7 +341,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
   </div>
   <nav class="month-rail" id="monthRail" aria-label="Cleaning rotation months"></nav>
 </header>
-
+ 
 <main>
   <!-- ============ DASHBOARD ============ -->
   <section class="view" id="view-dashboard" role="tabpanel" aria-label="Dashboard">
@@ -386,7 +387,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
       </div>
     </div>
   </section>
-
+ 
   <!-- ============ CHECKLIST ============ -->
   <section class="view" id="view-checklist" role="tabpanel" aria-label="Checklist">
     <div class="group-title-row">
@@ -399,11 +400,12 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print
       </button>
-      <button class="btn ghost" id="resetMonth">Reset month</button>
+      <button class="btn ghost" id="resetMonth">Reset week</button>
     </div>
+    <div class="weeks" id="clWeeks" style="margin-bottom:14px"></div>
     <div id="areaList"></div>
   </section>
-
+ 
   <!-- ============ FAMILIES ============ -->
   <section class="view" id="view-families" role="tabpanel" aria-label="Families">
     <div class="search-wrap">
@@ -421,7 +423,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
       <button class="btn" id="addFamilyBtn">Add</button>
     </div>
   </section>
-
+ 
   <!-- ============ SUPPLIES ============ -->
   <section class="view" id="view-supplies" role="tabpanel" aria-label="Supplies">
     <div class="group-title-row">
@@ -438,7 +440,7 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
     </div>
   </section>
 </main>
-
+ 
 <!-- Bottom navigation -->
 <nav class="tabbar" role="tablist" aria-label="Main navigation">
   <button class="tab" role="tab" data-view="dashboard" aria-selected="true">
@@ -458,10 +460,10 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
     Supplies
   </button>
 </nav>
-
+ 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="print-only" id="printSheet"></div>
-
+ 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ============================================================
@@ -469,12 +471,12 @@ main{max-width:960px;margin:0 auto;padding:18px 16px}
    ============================================================ */
 const GROUPS = [
   { id:'jul', month:'July', num:7, name:'Bishopric / Young Women',
-    families:["Lani Ita’aehau","Orlando Aitofele","Jamie Aloua","Zane and Brianna Carter","Alisi Fangupo","Joe and Shelli Hafoka","Marcus and Irene Hatfield","Alan Iwaasa","Bishop and Sunny Mahe","Sione and Ana Mahe","Eva and Sateki Mahe","Ezra and Kerstin Ngakuru","Tevita Palepale","Caylee Wendling","Richard and Tilila Paongo","Sosaia Paongo","Nathan and Ashley Speaker","George and Jenny Uyema","Ethan and Evie Woods"]},
+    families:["Lani Ita’aehau","Orlando Aitofele","Jamie Aloua","Zane and Brianna Carter","Alisi Fangupo","Joe and Shelli Hafoka","Marcus and Irene Hatfield","Alan Iwaasa","Bishop and Sunny Mahe","Sione and Ana Mahe","Fotu and Gursteen Moeai","Ezra and Kerstin Ngakuru","Tevita Palepale","Caylee Wendling","Richard and Tilila Paongo","Sosaia Paongo","Nathan and Ashley Speaker","George and Jenny Uyema","Ethan and Evie Woods"]},
   { id:'aug', month:'August', num:8, name:'Staley Havili / Relief Society / Welfare & Ministering',
     families:[
       "Josh and Nichole Enoch","Jason and Harmony Faga","Maka and Viola Fainga","Teki and Felofiaki Fetokai",
       "Sione and Kaati Fetokai","Ashley and Staley Havili","Joe and Tanya Mara","Uhila and Reichel Laimani",
-      "Fotu and Gursteen Moeai","Pina Lolohea","Sosefina Maka","Elizabeth Montero","Lopeti and Lupe Moungaloa",
+      "Eva and Sateki Mahe","Pina Lolohea","Sosefina Maka","Elizabeth Montero","Lopeti and Lupe Moungaloa",
       "Karlin and Jazz Nelson","Mikayla Powell","Tevita Finau","Daniel Tausinga","Regina Tausinga",
       "Marrie Tongolei","Connor Wigington"
     ]},
@@ -491,7 +493,7 @@ const GROUPS = [
       "Chad and Camilla Bowman","Nathan and Denise Dutta","Kelepi and Talafau Finau","Patrick and Leslie Gleaves","Ronald Kincey","Sione and Mandy Langi","Eteline Mataele","Maloni Mataele","Paula Mataele","Ashton and Halle Matheny","Jason and Melissa Matheny","Leni and Tristan Neiufi","Okusitino and Kalolaine Pulu","John and Kailani Raass","Logan and McKenzie Raass","Lovi Tulikihihifo","Hugh and Christina Wilson","Samiu and Vina Katoa","Peia and Mele Fililava"
     ]}
 ];
-
+ 
 const AREAS = [
   { id:'chapel', name:'Chapel', tasks:[
       'Vacuum the sacrament chapel','Empty all trash cans','Wipe pews if needed']},
@@ -514,14 +516,14 @@ const AREAS = [
   { id:'building', name:'Entire Building', tasks:[
       'Replace with new bag for every trash can']}
 ];
-
+ 
 const DEFAULT_SUPPLIES = [
   'Trash bags','Toilet paper','Paper towels','Hand soap','Toilet cleaner',
   'Glass cleaner','Mop heads','Vacuum bags','Disinfectant wipes'
 ].map((n,i)=>({ id:'s'+i, name:n, qty:5, notes:'', request:false }));
-
+ 
 const LOW_THRESHOLD = 2;
-const APP_VERSION = '2026-07-07-v6';
+const APP_VERSION = '2026-07-07-v7';
 const STORE_KEY = 'lehi41-cleaning-v1';
 const VERSION_KEY = STORE_KEY + '-app-version';
 try {
@@ -530,7 +532,7 @@ try {
     window.localStorage.setItem(VERSION_KEY, APP_VERSION);
   }
 } catch (e) {}
-
+ 
 /* ============================================================
    Supabase (cloud sync) — PASTE YOUR TWO VALUES BELOW.
    Find them in your Supabase dashboard under
@@ -539,7 +541,7 @@ try {
    ============================================================ */
 const SUPABASE_URL = 'https://evidptumwaumznaqvmme.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2aWRwdHVtd2F1bXpuYXF2bW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NDExNjUsImV4cCI6MjA5OTAxNzE2NX0.mEjmHYYb80iQrMq9JnuSdTC8RK_DX85jIOuHTvvR5D4';
-
+ 
 const CLOUD = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
 const CLEANING_YEAR = new Date().getFullYear(); // attendance & tasks are stored per year
 const sb = CLOUD ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -548,7 +550,7 @@ const familyById = {};  // db id -> { group, name }
 function cloudErr(where){
   return (res) => { if(res && res.error){ console.error(where, res.error); toast('Sync failed — check your connection'); } };
 }
-
+ 
 /* ============================================================
    Storage — localStorage when available, in-memory fallback
    ============================================================ */
@@ -570,7 +572,7 @@ const storage = (() => {
     return { load: () => mem, save: (s) => { mem = JSON.parse(JSON.stringify(s)); }, persistent: false };
   }
 })();
-
+ 
 /* ============================================================
    State
    ============================================================ */
@@ -588,7 +590,7 @@ GROUPS.forEach(g => {
   if(!state.months[g.id].familyList) state.months[g.id].familyList = g.families.slice();
 });
 if(!state.supplies) state.supplies = JSON.parse(JSON.stringify(DEFAULT_SUPPLIES));
-
+ 
 /* Roster sync — the GROUPS lists in this file are the source of truth.
    If names are added, removed, or moved between groups in the code, this
    fingerprint changes and the saved family lists are rebuilt from the code.
@@ -610,10 +612,10 @@ if(!CLOUD && state.rosterHash !== ROSTER_HASH){
   state.rosterHash = ROSTER_HASH;
   storage.save(state);
 }
-
+ 
 let selectedMonth = currentMonthId();
 let currentView = 'dashboard';
-
+ 
 /* Weekly tracking — every month is broken into its Saturdays.
    ms.families[name] is an object like {0:true, 2:true} meaning
    the family helped on that month's 1st and 3rd Saturdays. */
@@ -624,13 +626,29 @@ function saturdaysFor(monthNum){
   const out = [];
   const d = new Date(y, monthNum - 1, 1);
   while(d.getMonth() === monthNum - 1){
-    if(d.getDay() === 6) out.push({ label: monthNum + '/' + d.getDate(), long: d.toLocaleDateString(undefined, { month:'short', day:'numeric' }) });
+    if(d.getDay() === 6) out.push({ label: monthNum + '/' + d.getDate(), long: d.toLocaleDateString(undefined, { month:'short', day:'numeric' }), day: d.getDate() });
     d.setDate(d.getDate() + 1);
   }
   return (_satCache[monthNum] = out);
 }
 function weeksHelped(rec){ return rec ? Object.values(rec).filter(Boolean).length : 0; }
-
+ 
+/* The checklist is per-Saturday too. Each month remembers which
+   Saturday is selected; default = today's/next upcoming Saturday. */
+const selectedWeeks = {};
+function getWeek(g){
+  if(selectedWeeks[g.id] !== undefined) return selectedWeeks[g.id];
+  const sats = saturdaysFor(g.num);
+  let w = 0;
+  const now = new Date();
+  if(now.getFullYear() === CLEANING_YEAR && now.getMonth() + 1 === g.num){
+    w = sats.findIndex(s => s.day >= now.getDate());
+    if(w < 0) w = sats.length - 1;
+  }
+  return (selectedWeeks[g.id] = w);
+}
+function tkey(week, taskId){ return week + ':' + taskId; }
+ 
 /* Migrate saves from the old one-checkmark-per-month format:
    a plain `true` becomes "helped on week 1" so no credit is lost. */
 GROUPS.forEach(g => {
@@ -641,7 +659,7 @@ GROUPS.forEach(g => {
   });
 });
 storage.save(state);
-
+ 
 function currentMonthId(){
   const m = new Date().getMonth() + 1;
   const g = GROUPS.find(g => g.num === m);
@@ -652,7 +670,7 @@ function group(id){ return GROUPS.find(g => g.id === (id || selectedMonth)); }
 function mstate(id){ return state.months[id || selectedMonth]; }
 function allTasks(){ return AREAS.flatMap(a => a.tasks.map((t,i)=>({ id:a.id+'-'+i, label:t, area:a }))); }
 function taskId(areaId, i){ return areaId + '-' + i; }
-
+ 
 /* ============================================================
    Theme
    ============================================================ */
@@ -668,7 +686,7 @@ document.getElementById('themeBtn').addEventListener('click', () => {
   applyTheme(); save();
   toast('Theme: ' + state.theme);
 });
-
+ 
 /* ============================================================
    Toast
    ============================================================ */
@@ -680,7 +698,7 @@ function toast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>el.classList.remove('show'), 2200);
 }
-
+ 
 /* ============================================================
    Month rail
    ============================================================ */
@@ -698,14 +716,15 @@ function renderRail(){
     rail.appendChild(b);
   });
 }
-
+ 
 /* ============================================================
    Dashboard
    ============================================================ */
 function progressFor(monthId){
   const ms = mstate(monthId);
+  const w = getWeek(group(monthId));
   const total = allTasks().length;
-  const done = allTasks().filter(t => ms.tasks[t.id]).length;
+  const done = allTasks().filter(t => ms.tasks[tkey(w, t.id)]).length;
   return { done, total, pct: total ? Math.round(done/total*100) : 0 };
 }
 function renderDashboard(){
@@ -713,25 +732,25 @@ function renderDashboard(){
   const ms = mstate();
   const p = progressFor(g.id);
   const isNow = g.id === currentMonthId();
-
+ 
   document.getElementById('heroEyebrow').textContent = isNow ? 'This month · ' + g.month : g.month + ' assignment';
   document.getElementById('heroGroup').textContent = g.name;
   document.getElementById('statFamilies').textContent = ms.familyList.length;
   document.getElementById('statTasks').textContent = p.done + '/' + p.total;
   document.getElementById('statFamDone').textContent = ms.familyList.filter(f => weeksHelped(ms.families[f]) > 0).length;
   document.getElementById('ringPct').textContent = p.pct + '%';
-
+ 
   const bar = document.getElementById('ringBar');
   const C = 2 * Math.PI * 45;
   bar.setAttribute('stroke-dasharray', C);
   bar.setAttribute('stroke-dashoffset', C * (1 - p.pct/100));
   document.getElementById('progressBar').style.width = p.pct + '%';
   document.getElementById('progressWrap').setAttribute('aria-valuenow', p.pct);
-
+ 
   const gi = GROUPS.indexOf(g);
   const next = GROUPS[(gi + 1) % GROUPS.length];
   document.getElementById('nextUp').innerHTML = '<b>Up next in ' + next.month + ':</b> ' + esc(next.name);
-
+ 
   // Supply alerts
   const alerts = state.supplies.filter(s => s.qty <= LOW_THRESHOLD || s.request);
   const list = document.getElementById('alertList');
@@ -745,7 +764,7 @@ function renderDashboard(){
       '<small>' + s.qty + ' left</small>';
     list.appendChild(d);
   });
-
+ 
   // Families preview (first 6)
   const famWrap = document.getElementById('dashFamilies');
   document.getElementById('dashFamCount').textContent = ms.familyList.length;
@@ -765,13 +784,14 @@ function renderDashboard(){
     more.textContent = '+ ' + (ms.familyList.length - 6) + ' more';
     famWrap.appendChild(more);
   }
-
+ 
   // Area summary
   const areaWrap = document.getElementById('dashAreas');
-  document.getElementById('dashTaskCount').textContent = p.done + '/' + p.total;
+  const wk = saturdaysFor(g.num)[getWeek(g)];
+  document.getElementById('dashTaskCount').textContent = p.done + '/' + p.total + ' \u00b7 ' + wk.label;
   areaWrap.innerHTML = '';
   AREAS.forEach(a => {
-    const done = a.tasks.filter((_,i) => ms.tasks[taskId(a.id,i)]).length;
+    const done = a.tasks.filter((_,i) => ms.tasks[tkey(getWeek(g), taskId(a.id,i))]).length;
     const row = document.createElement('div');
     row.className = 'alert-item';
     row.innerHTML = '<span class="dot" style="background:' + (done === a.tasks.length ? 'var(--ok)' : done ? 'var(--amber)' : 'var(--line)') + '"></span>' +
@@ -779,7 +799,7 @@ function renderDashboard(){
     areaWrap.appendChild(row);
   });
 }
-
+ 
 /* ============================================================
    Checklist
    ============================================================ */
@@ -787,16 +807,31 @@ const openAreas = new Set();
 function renderChecklist(){
   const g = group();
   const ms = mstate();
-  document.getElementById('clTitle').textContent = g.month + ' checklist';
+  const weeks = saturdaysFor(g.num);
+  const w = getWeek(g);
+  document.getElementById('clTitle').textContent = g.month + ' checklist \u00b7 ' + weeks[w].label;
   document.getElementById('clBadge').textContent = g.name;
-
+ 
+  // Saturday selector — same chips as the family rows
+  const sel = document.getElementById('clWeeks');
+  sel.innerHTML = '';
+  weeks.forEach((wk, i) => {
+    const chip = document.createElement('button');
+    chip.className = 'week-chip' + (i === w ? ' on' : '');
+    chip.textContent = wk.label;
+    chip.setAttribute('aria-pressed', String(i === w));
+    chip.setAttribute('aria-label', 'Show checklist for Saturday ' + wk.long);
+    chip.addEventListener('click', () => { selectedWeeks[g.id] = i; renderChecklist(); renderDashboard(); });
+    sel.appendChild(chip);
+  });
+ 
   const wrap = document.getElementById('areaList');
   wrap.innerHTML = '';
   AREAS.forEach(a => {
-    const done = a.tasks.filter((_,i) => ms.tasks[taskId(a.id,i)]).length;
+    const done = a.tasks.filter((_,i) => ms.tasks[tkey(w, taskId(a.id,i))]).length;
     const el = document.createElement('div');
     el.className = 'area' + (openAreas.has(a.id) ? ' open' : '') + (done === a.tasks.length ? ' done' : '');
-
+ 
     const head = document.createElement('button');
     head.className = 'area-head';
     head.setAttribute('aria-expanded', String(openAreas.has(a.id)));
@@ -809,7 +844,7 @@ function renderChecklist(){
       renderChecklist();
     });
     el.appendChild(head);
-
+ 
     const body = document.createElement('div');
     body.className = 'area-body';
     a.tasks.forEach((t, i) => {
@@ -817,13 +852,13 @@ function renderChecklist(){
       const label = document.createElement('label');
       label.className = 'task';
       label.innerHTML =
-        '<input type="checkbox"' + (ms.tasks[tid] ? ' checked' : '') + ' aria-label="' + esc(t) + '">' +
+        '<input type="checkbox"' + (ms.tasks[tkey(w, tid)] ? ' checked' : '') + ' aria-label="' + esc(t) + '">' +
         '<span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>' +
         '<span class="t-label">' + esc(t) + '</span>';
       label.querySelector('input').addEventListener('change', (e) => {
-        ms.tasks[tid] = e.target.checked;
+        ms.tasks[tkey(w, tid)] = e.target.checked;
         save(); renderChecklist(); renderDashboard();
-        if(CLOUD) sb.from('task_checks').upsert({ group_id: g.id, cleaning_year: CLEANING_YEAR, task_id: tid, checked: e.target.checked }).then(cloudErr('task'));
+        if(CLOUD) sb.from('task_checks').upsert({ group_id: g.id, cleaning_year: CLEANING_YEAR, week_index: w, task_id: tid, checked: e.target.checked }).then(cloudErr('task'));
       });
       body.appendChild(label);
     });
@@ -831,7 +866,7 @@ function renderChecklist(){
     wrap.appendChild(el);
   });
 }
-
+ 
 document.getElementById('expandAll').addEventListener('click', () => {
   if(openAreas.size === AREAS.length) openAreas.clear();
   else AREAS.forEach(a => openAreas.add(a.id));
@@ -839,16 +874,15 @@ document.getElementById('expandAll').addEventListener('click', () => {
 });
 document.getElementById('resetMonth').addEventListener('click', () => {
   const g = group();
-  if(!confirm('Clear all checked tasks and attendance for ' + g.month + '? This clears it for everyone.')) return;
-  mstate().tasks = {}; mstate().families = {};
-  save(); renderAll(); toast(g.month + ' reset');
-  if(CLOUD){
-    sb.from('task_checks').delete().eq('group_id', g.id).eq('cleaning_year', CLEANING_YEAR).then(cloudErr('reset'));
-    const ids = Object.values(familyIds[g.id] || {});
-    if(ids.length) sb.from('attendance').delete().in('family_id', ids).eq('cleaning_year', CLEANING_YEAR).then(cloudErr('reset'));
-  }
+  const w = getWeek(g);
+  const wk = saturdaysFor(g.num)[w];
+  if(!confirm('Clear the checklist for Saturday ' + wk.label + '? This clears it for everyone. (Family attendance is not affected.)')) return;
+  const ms = mstate();
+  Object.keys(ms.tasks).forEach(k => { if(k.startsWith(w + ':')) delete ms.tasks[k]; });
+  save(); renderAll(); toast(wk.label + ' checklist reset');
+  if(CLOUD) sb.from('task_checks').delete().eq('group_id', g.id).eq('cleaning_year', CLEANING_YEAR).eq('week_index', w).then(cloudErr('reset'));
 });
-
+ 
 /* ============================================================
    Families
    ============================================================ */
@@ -858,7 +892,7 @@ function renderFamilies(){
   const titleRow = document.getElementById('famTitleRow');
   const hint = document.getElementById('famHint');
   wrap.innerHTML = '';
-
+ 
   if(q){
     titleRow.querySelector('h2').textContent = 'Search results';
     document.getElementById('famBadge').textContent = 'all groups';
@@ -872,7 +906,7 @@ function renderFamilies(){
     if(!hits) wrap.innerHTML = '<div class="empty">No families match “' + esc(q) + '”.</div>';
     return;
   }
-
+ 
   const g = group();
   const ms = mstate();
   titleRow.querySelector('h2').textContent = g.month + ' · ' + ms.familyList.filter(f => weeksHelped(ms.families[f]) > 0).length + ' of ' + ms.familyList.length + ' have helped';
@@ -881,7 +915,7 @@ function renderFamilies(){
   ms.familyList.forEach(f => wrap.appendChild(familyRow(g, f, false)));
   if(!ms.familyList.length) wrap.innerHTML = '<div class="empty">No families in this group yet.</div>';
 }
-
+ 
 function familyRow(g, name, showMonth){
   const ms = mstate(g.id);
   const weeks = saturdaysFor(g.num);
@@ -889,13 +923,13 @@ function familyRow(g, name, showMonth){
   const helped = weeksHelped(rec);
   const row = document.createElement('div');
   row.className = 'family' + (helped === weeks.length ? ' done' : '');
-
+ 
   const info = document.createElement('div');
   info.className = 'f-info';
   info.innerHTML = '<div class="f-name">' + esc(name) +
     (showMonth ? ' <span class="badge month">' + g.month + '</span>' : '') +
     ' <span class="f-count">' + helped + '/' + weeks.length + ' wks</span></div>';
-
+ 
   const chipWrap = document.createElement('div');
   chipWrap.className = 'weeks';
   weeks.forEach((w, i) => {
@@ -923,9 +957,9 @@ function familyRow(g, name, showMonth){
   });
   info.appendChild(chipWrap);
   row.appendChild(info);
-
+ 
   if(CLOUD) return row; // roster is managed in the Supabase dashboard
-
+ 
   const del = document.createElement('button');
   del.className = 'f-remove';
   del.setAttribute('aria-label', 'Remove ' + name);
@@ -939,7 +973,7 @@ function familyRow(g, name, showMonth){
   row.appendChild(del);
   return row;
 }
-
+ 
 document.getElementById('familySearch').addEventListener('input', renderFamilies);
 document.getElementById('addFamilyBtn').addEventListener('click', addFamily);
 document.getElementById('newFamilyName').addEventListener('keydown', e => { if(e.key === 'Enter') addFamily(); });
@@ -955,7 +989,7 @@ function addFamily(){
   save(); renderFamilies(); renderDashboard();
   toast(name + ' added to ' + group().month);
 }
-
+ 
 /* ============================================================
    Supplies
    ============================================================ */
@@ -967,13 +1001,13 @@ function renderSupplies(){
     const low = s.qty <= LOW_THRESHOLD;
     const el = document.createElement('div');
     el.className = 'supply' + (low ? ' low' : '') + (s.request ? ' req' : '');
-
+ 
     const top = document.createElement('div');
     top.className = 's-top';
     top.innerHTML = '<span class="s-name">' + esc(s.name) + '</span>' +
       (low ? '<span class="s-flag low">Low</span>' : '') +
       (s.request ? '<span class="s-flag req">Requested</span>' : '');
-
+ 
     const qty = document.createElement('div');
     qty.className = 'qty';
     const minus = btnQ('−', 'Decrease ' + s.name), plus = btnQ('+', 'Increase ' + s.name);
@@ -984,7 +1018,7 @@ function renderSupplies(){
     qty.append(minus, val, plus);
     top.appendChild(qty);
     el.appendChild(top);
-
+ 
     const bottom = document.createElement('div');
     bottom.className = 's-bottom';
     const notes = document.createElement('textarea');
@@ -1031,7 +1065,7 @@ function addSupply(){
     });
   }
 }
-
+ 
 /* ============================================================
    Print
    ============================================================ */
@@ -1056,7 +1090,7 @@ function buildPrintSheet(){
 function doPrint(){ buildPrintSheet(); window.print(); }
 document.getElementById('printBtn').addEventListener('click', doPrint);
 document.getElementById('printBtn2').addEventListener('click', doPrint);
-
+ 
 /* ============================================================
    Navigation
    ============================================================ */
@@ -1068,13 +1102,13 @@ function showView(v){
 }
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
 document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showView(b.dataset.goto)));
-
+ 
 /* ============================================================
    Utilities & boot
    ============================================================ */
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function renderAll(){ renderRail(); renderDashboard(); renderChecklist(); renderFamilies(); renderSupplies(); }
-
+ 
 /* ============================================================
    Cloud sync — initial load + live updates from Supabase
    ============================================================ */
@@ -1087,7 +1121,7 @@ async function loadCloud(){
     sb.from('supplies').select('*').order('id')
   ]);
   for(const r of [g, f, att, tc, sup]) if(r.error) throw r.error;
-
+ 
   g.data.forEach(row => { const gr = GROUPS.find(x => x.id === row.id); if(gr) gr.name = row.name; });
   GROUPS.forEach(x => {
     state.months[x.id].familyList = [];
@@ -1107,12 +1141,12 @@ async function loadCloud(){
     (ms.families[fam.name] = ms.families[fam.name] || {})[row.week_index] = true;
   });
   tc.data.forEach(row => {
-    if(state.months[row.group_id] && row.checked) state.months[row.group_id].tasks[row.task_id] = true;
+    if(state.months[row.group_id] && row.checked) state.months[row.group_id].tasks[tkey(row.week_index || 0, row.task_id)] = true;
   });
   state.supplies = sup.data.map(r => ({ id:r.id, name:r.name, qty:r.qty, notes:r.notes || '', request:!!r.request }));
   storage.save(state); // keep an offline snapshot on this device
 }
-
+ 
 let liveConnected = false;
 let pollTimer = null;
 function subscribeRealtime(){
@@ -1120,8 +1154,9 @@ function subscribeRealtime(){
     .on('postgres_changes', { event:'*', schema:'public', table:'task_checks' }, p => {
       const row = (p.new && p.new.group_id) ? p.new : p.old;
       if(!row || row.cleaning_year !== CLEANING_YEAR || !state.months[row.group_id]) return;
-      if(p.eventType === 'DELETE' || !p.new.checked) delete state.months[row.group_id].tasks[row.task_id];
-      else state.months[row.group_id].tasks[row.task_id] = true;
+      const k = tkey(row.week_index || 0, row.task_id);
+      if(p.eventType === 'DELETE' || !p.new.checked) delete state.months[row.group_id].tasks[k];
+      else state.months[row.group_id].tasks[k] = true;
       storage.save(state); renderChecklist(); renderDashboard();
     })
     .on('postgres_changes', { event:'*', schema:'public', table:'attendance' }, p => {
@@ -1165,7 +1200,7 @@ function subscribeRealtime(){
       }
     });
 }
-
+ 
 applyTheme();
 document.querySelector('.brand small').textContent = 'Chapel Cleaning · ' + APP_VERSION + (CLOUD ? ' · cloud' : ' · device-only');
 renderAll();
@@ -1181,7 +1216,7 @@ if(CLOUD){
 } else {
   setTimeout(() => toast('⚠ Not connected to the database — this device is in device-only mode and will NOT share data'), 600);
 }
-
+ 
 // PWA service worker — network-first for pages, so updates always appear.
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js?v=' + APP_VERSION).catch(()=>{}));
@@ -1189,3 +1224,4 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 </script>
 </body>
 </html>
+ 
